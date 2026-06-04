@@ -429,7 +429,7 @@ export default function App() {
             {!results && !loading && (
               <div style={{ display: "flex", alignItems: "center", justifyContent: "center", height: "100%", flexDirection: "column", gap: 16 }}>
                 <img
-                  src="/vial.png"
+                  src="/logo.png"
                   alt="Select a reaction to begin"
                   style={{ width: 80, height: 80, objectFit: "contain", opacity: 0.7 }}
                   onError={e => { e.target.replaceWith(Object.assign(document.createElement('span'), { textContent: '⚗️', style: 'font-size:48px' })); }}
