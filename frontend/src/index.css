@@ -1,0 +1,45 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  background-color: #0a1a0f;
+  color: #ffffff;
+  font-family: 'Inter', -apple-system, sans-serif;
+  min-height: 100vh;
+}
+
+:root {
+  --green: #6dbf67;
+  --dark-green: #0a1a0f;
+  --card-bg: #112218;
+  --border: #1e3a28;
+  --text-secondary: #8aaa90;
+  --mono: 'Courier New', monospace;
+}
+
+input, select {
+  background: #0d1f14;
+  border: 1px solid var(--border);
+  color: white;
+  padding: 6px 10px;
+  border-radius: 6px;
+  font-size: 13px;
+  width: 100%;
+  outline: none;
+}
+
+input:focus, select:focus {
+  border-color: var(--green);
+}
+
+button {
+  cursor: pointer;
+  border: none;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 500;
+  padding: 8px 16px;
+}
