@@ -75,9 +75,9 @@ function tempToColor(T) {
 }
 
 function TempBar({ tMin, tMax }) {
-  const startPct = ((tMin - TEMP_GLOBAL_MIN) / (TEMP_GLOBAL_MAX - TEMP_GLOBAL_MIN)) * 100;
-  const endPct   = ((tMax - TEMP_GLOBAL_MIN) / (TEMP_GLOBAL_MAX - TEMP_GLOBAL_MIN)) * 100;
-  const widthPct = endPct - startPct;
+  const startPct  = ((tMin - TEMP_GLOBAL_MIN) / (TEMP_GLOBAL_MAX - TEMP_GLOBAL_MIN)) * 100;
+  const endPct    = ((tMax - TEMP_GLOBAL_MIN) / (TEMP_GLOBAL_MAX - TEMP_GLOBAL_MIN)) * 100;
+  const widthPct  = endPct - startPct;
   const startColor = tempToColor(tMin);
   const endColor   = tempToColor(tMax);
   return (
@@ -96,13 +96,11 @@ function TempBar({ tMin, tMax }) {
       <div style={{ position: 'relative', height: 16, marginTop: 3 }}>
         <span style={{
           position: 'absolute', left: `clamp(0%, ${startPct}%, 85%)`,
-          fontSize: 10, color: startColor,
-          transform: 'translateX(-10%)', whiteSpace: 'nowrap'
+          fontSize: 10, color: startColor, transform: 'translateX(-10%)', whiteSpace: 'nowrap'
         }}>{tMin}K</span>
         <span style={{
           position: 'absolute', left: `clamp(15%, ${endPct}%, 100%)`,
-          fontSize: 10, color: endColor,
-          transform: 'translateX(-90%)', whiteSpace: 'nowrap'
+          fontSize: 10, color: endColor, transform: 'translateX(-90%)', whiteSpace: 'nowrap'
         }}>{tMax}K</span>
       </div>
     </div>
@@ -119,62 +117,99 @@ function CatalystBadge({ catalyst }) {
   );
 }
 
+function InfoModal({ onClose }) {
+  return (
+    <div style={{
+      position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.75)',
+      display: 'flex', alignItems: 'center', justifyContent: 'center',
+      zIndex: 1000
+    }} onClick={onClose}>
+      <div style={{
+        background: '#0d1f14', border: '1px solid #1e3a28', borderRadius: 12,
+        padding: 32, maxWidth: 560, width: '90%', maxHeight: '80vh', overflowY: 'auto'
+      }} onClick={e => e.stopPropagation()}>
+
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
+          <span style={{ color: '#6dbf67', fontWeight: 700, fontSize: 18, letterSpacing: 1 }}>KINETIC LAB</span>
+          <button onClick={onClose} style={{ background: 'none', color: '#8aaa90', fontSize: 20, padding: '0 4px' }}>×</button>
+        </div>
+
+        <p style={{ fontSize: 13, color: '#8aaa90', lineHeight: 1.7, marginBottom: 20 }}>
+          Kinetic Lab is a general-purpose catalytic reactor simulator that models real industrial
+          chemical reactions using peer-reviewed kinetic parameters and live thermodynamic data
+          from the Cantera software library.
+        </p>
+
+        <p style={{ fontSize: 12, color: '#6dbf67', fontWeight: 600, textTransform: 'uppercase', letterSpacing: 1, marginBottom: 8 }}>How to use</p>
+        <ol style={{ fontSize: 13, color: '#8aaa90', lineHeight: 2, paddingLeft: 18, marginBottom: 20 }}>
+          <li>Go to the <strong style={{ color: 'white' }}>Registry</strong> tab and click reactions to select them</li>
+          <li>Switch to the <strong style={{ color: 'white' }}>Simulator</strong> tab</li>
+          <li>Choose a reactor type — PFR, Batch, or CSTR</li>
+          <li>Enter inlet concentrations for each species (mol/m³)</li>
+          <li>Set reactor conditions such as temperature, length, and velocity</li>
+          <li>Click <strong style={{ color: '#6dbf67' }}>Run Simulation</strong></li>
+        </ol>
+
+        <p style={{ fontSize: 12, color: '#6dbf67', fontWeight: 600, textTransform: 'uppercase', letterSpacing: 1, marginBottom: 8 }}>Features</p>
+        <ul style={{ fontSize: 13, color: '#8aaa90', lineHeight: 2, paddingLeft: 18, marginBottom: 20 }}>
+          <li>25 reactions across 8 industrial chemistry families</li>
+          <li>RK4 integration for PFR and Batch reactors</li>
+          <li>Newton-Raphson solver for CSTR steady-state</li>
+          <li>Cantera thermodynamics for live Cp, density, and ΔH</li>
+          <li>Economic analysis including CapEx and operating cost estimates</li>
+          <li>Color-coded reaction registry with temperature range visualization</li>
+        </ul>
+
+        <p style={{ fontSize: 12, color: '#6dbf67', fontWeight: 600, textTransform: 'uppercase', letterSpacing: 1, marginBottom: 8 }}>Team</p>
+        <p style={{ fontSize: 13, color: 'white', lineHeight: 2, marginBottom: 4 }}>
+          Advait Mishra · Yael Ranel Filus · Grace Yang
+        </p>
+        <p style={{ fontSize: 12, color: '#8aaa90', lineHeight: 2 }}>
+          Advisors: Professor Andrew Peterson, Prajna Jalagam
+        </p>
+
+        <p style={{ fontSize: 11, color: '#4a6a52', marginTop: 20 }}>
+          Kinetic parameters sourced from Deutschmann et al. 2000, Xu & Froment 1989,
+          Chatterjee et al. 2006, Pakhare & Spivey 2014, and others.
+        </p>
+      </div>
+    </div>
+  );
+}
+
 function CostPanel({ costs }) {
   if (!costs || costs.error) return null;
-
   const netPositive = costs.net_operating <= 0;
-
-  const metricCard = (label, value, sub, color) => (
+  const card = (label, value, sub, color) => (
     <div style={{ background: "#0d1f14", border: "1px solid #1e3a28", borderRadius: 8, padding: "12px 16px" }}>
       <p style={{ fontSize: 11, color: "#8aaa90", marginBottom: 4 }}>{label}</p>
       <p style={{ fontSize: 20, fontFamily: "monospace", color: color || "white", fontWeight: 600 }}>{value}</p>
       {sub && <p style={{ fontSize: 11, color: "#8aaa90", marginTop: 2 }}>{sub}</p>}
     </div>
   );
-
   return (
     <div style={{ background: "#112218", border: "1px solid #1e3a28", borderRadius: 8, padding: 16, marginTop: 16 }}>
       <p style={{ fontSize: 12, color: "#8aaa90", marginBottom: 14, letterSpacing: 1 }}>ECONOMIC ANALYSIS</p>
-
-      {/* Operating costs row */}
       <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 10, marginBottom: 12 }}>
-        {metricCard("Feedstock cost", `$${costs.feedstock_cost.toFixed(4)}/hr`, "inlet chemicals", "#f87171")}
-        {metricCard("Product value", `$${costs.product_value.toFixed(4)}/hr`, "outlet chemicals", "#6dbf67")}
-        {metricCard("Energy cost", `$${costs.energy_cost.toFixed(4)}/hr`, `${costs.thermal_duty_W.toFixed(1)} W thermal`, "#facc15")}
-        {metricCard(
-          "Net operating",
-          `$${Math.abs(costs.net_operating).toFixed(4)}/hr`,
-          netPositive ? "net profit" : "net cost",
-          netPositive ? "#6dbf67" : "#f87171"
-        )}
+        {card("Feedstock cost",  `$${costs.feedstock_cost.toFixed(4)}/hr`,  "inlet chemicals",                          "#f87171")}
+        {card("Product value",   `$${costs.product_value.toFixed(4)}/hr`,   "outlet chemicals",                         "#6dbf67")}
+        {card("Energy cost",     `$${costs.energy_cost.toFixed(4)}/hr`,     `${costs.thermal_duty_W.toFixed(1)} W thermal`, "#facc15")}
+        {card("Net operating",   `$${Math.abs(costs.net_operating).toFixed(4)}/hr`, netPositive ? "net profit" : "net cost", netPositive ? "#6dbf67" : "#f87171")}
       </div>
-
-      {/* CapEx row */}
       <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 10, marginBottom: 12 }}>
-        {metricCard("Vessel CapEx", `$${Number(costs.vessel_capex).toLocaleString()}`, `${costs.volume_m3} m³ reactor`, "#60a5fa")}
-        {metricCard("Catalyst CapEx", `$${Number(costs.catalyst_capex).toLocaleString()}`, `${costs.catalyst_mass_kg} kg ${costs.catalyst}`, "#a78bfa")}
-        {metricCard("Total CapEx", `$${Number(costs.total_capex).toLocaleString()}`, "one-time capital cost", "#e879f9")}
+        {card("Vessel CapEx",   `$${Number(costs.vessel_capex).toLocaleString()}`,   `${costs.volume_m3} m³ reactor`,      "#60a5fa")}
+        {card("Catalyst CapEx", `$${Number(costs.catalyst_capex).toLocaleString()}`, `${costs.catalyst_mass_kg} kg ${costs.catalyst}`, "#a78bfa")}
+        {card("Total CapEx",    `$${Number(costs.total_capex).toLocaleString()}`,    "one-time capital cost",              "#e879f9")}
       </div>
-
-      {/* Per-24h projection */}
       <div style={{
         background: "#0a1a0f", border: "1px solid #1e3a28", borderRadius: 6,
         padding: "10px 14px", display: "flex", gap: 32, alignItems: "center"
       }}>
-        <span style={{ fontSize: 11, color: "#8aaa90" }}>Per 24 hr projection:</span>
-        <span style={{ fontSize: 13, color: "#f87171", fontFamily: "monospace" }}>
-          Feedstock: ${(costs.feedstock_cost * 24).toFixed(2)}
-        </span>
-        <span style={{ fontSize: 13, color: "#6dbf67", fontFamily: "monospace" }}>
-          Product: ${(costs.product_value * 24).toFixed(2)}
-        </span>
-        <span style={{ fontSize: 13, color: "#facc15", fontFamily: "monospace" }}>
-          Energy: ${(costs.energy_cost * 24).toFixed(2)}
-        </span>
-        <span style={{
-          fontSize: 14, fontFamily: "monospace", fontWeight: 700,
-          color: netPositive ? "#6dbf67" : "#f87171"
-        }}>
+        <span style={{ fontSize: 11, color: "#8aaa90" }}>Per 24 hr:</span>
+        <span style={{ fontSize: 13, color: "#f87171",  fontFamily: "monospace" }}>Feedstock: ${(costs.feedstock_cost * 24).toFixed(2)}</span>
+        <span style={{ fontSize: 13, color: "#6dbf67",  fontFamily: "monospace" }}>Product: ${(costs.product_value * 24).toFixed(2)}</span>
+        <span style={{ fontSize: 13, color: "#facc15",  fontFamily: "monospace" }}>Energy: ${(costs.energy_cost * 24).toFixed(2)}</span>
+        <span style={{ fontSize: 14, fontFamily: "monospace", fontWeight: 700, color: netPositive ? "#6dbf67" : "#f87171" }}>
           Net: {netPositive ? "+" : "-"}${Math.abs(costs.net_operating * 24).toFixed(2)}
         </span>
       </div>
@@ -191,11 +226,12 @@ export default function App() {
     T0: 500, u: 0.1, L: 1.0, n: 1000,
     V: 0.01, Q: 0.001, t_end: 10.0, A_cs: 0.01
   });
-  const [results, setResults]     = useState(null);
-  const [loading, setLoading]     = useState(false);
-  const [error, setError]         = useState(null);
-  const [activeTab, setActiveTab] = useState("simulator");
+  const [results, setResults]       = useState(null);
+  const [loading, setLoading]       = useState(false);
+  const [error, setError]           = useState(null);
+  const [activeTab, setActiveTab]   = useState("simulator");
   const [familyFilter, setFamilyFilter] = useState("All");
+  const [showInfo, setShowInfo]     = useState(false);
 
   useEffect(() => {
     axios.get(`${API}/reactions`).then(r => setReactions(r.data));
@@ -246,14 +282,37 @@ export default function App() {
   return (
     <div style={{ minHeight: "100vh" }}>
 
+      {showInfo && <InfoModal onClose={() => setShowInfo(false)} />}
+
       {/* Navbar */}
       <nav style={{
         background: "#0d1f14", borderBottom: "1px solid #1e3a28",
         padding: "0 24px", display: "flex", alignItems: "center",
         justifyContent: "space-between", height: 52
       }}>
-        <div style={{ display: "flex", alignItems: "center", gap: 32 }}>
-          <span style={{ color: "#6dbf67", fontWeight: 700, fontSize: 16, letterSpacing: 1 }}>KINETIC LAB</span>
+        <div style={{ display: "flex", alignItems: "center", gap: 20 }}>
+
+          {/* Logo */}
+          <img
+            src="/logo.png"
+            alt="Kinetic Lab"
+            style={{ height: 32, width: "auto", objectFit: "contain" }}
+            onError={e => { e.target.style.display = 'none'; }}
+          />
+
+          <span style={{ color: "#6dbf67", fontWeight: 700, fontSize: 16, letterSpacing: 1 }}>
+            KINETIC LAB
+          </span>
+
+          {/* Info button */}
+          <button onClick={() => setShowInfo(true)} style={{
+            background: "none", color: "#8aaa90", fontSize: 16,
+            padding: "2px 4px", borderRadius: "50%", lineHeight: 1,
+            border: "1px solid #1e3a28"
+          }} title="About & How to Use">ⓘ</button>
+
+          <div style={{ width: 1, height: 20, background: "#1e3a28" }} />
+
           {["simulator", "registry"].map(tab => (
             <button key={tab} onClick={() => setActiveTab(tab)} style={{
               background: "none", color: activeTab === tab ? "#6dbf67" : "#8aaa90",
@@ -264,6 +323,7 @@ export default function App() {
             }}>{tab}</button>
           ))}
         </div>
+
         <button onClick={runSimulation} style={{
           background: "#6dbf67", color: "#0a1a0f", fontWeight: 700, padding: "8px 20px", fontSize: 13
         }}>
@@ -367,8 +427,13 @@ export default function App() {
           {/* Results */}
           <div style={{ flex: 1, padding: 20, overflowY: "auto" }}>
             {!results && !loading && (
-              <div style={{ display: "flex", alignItems: "center", justifyContent: "center", height: "100%", flexDirection: "column", gap: 12 }}>
-                <span style={{ fontSize: 32 }}>⚗️</span>
+              <div style={{ display: "flex", alignItems: "center", justifyContent: "center", height: "100%", flexDirection: "column", gap: 16 }}>
+                <img
+                  src="/vial.png"
+                  alt="Select a reaction to begin"
+                  style={{ width: 80, height: 80, objectFit: "contain", opacity: 0.7 }}
+                  onError={e => { e.target.replaceWith(Object.assign(document.createElement('span'), { textContent: '⚗️', style: 'font-size:48px' })); }}
+                />
                 <p style={{ color: "#8aaa90", fontSize: 14 }}>Select reactions from the Registry tab, set conditions, and run.</p>
               </div>
             )}
@@ -379,7 +444,6 @@ export default function App() {
             )}
             {results && !loading && (
               <>
-                {/* Conversion metric cards */}
                 <div style={{ display: "grid", gridTemplateColumns: `repeat(${Math.min(results.species.length + 1, 6)}, 1fr)`, gap: 10, marginBottom: 20 }}>
                   <div style={{ background: "#112218", border: "1px solid #1e3a28", borderRadius: 8, padding: "12px 16px" }}>
                     <p style={{ fontSize: 11, color: "#8aaa90" }}>EXIT TEMP</p>
@@ -397,7 +461,6 @@ export default function App() {
                   ))}
                 </div>
 
-                {/* Concentration chart */}
                 <div style={{ background: "#112218", border: "1px solid #1e3a28", borderRadius: 8, padding: 16, marginBottom: 16 }}>
                   <p style={{ fontSize: 12, color: "#8aaa90", marginBottom: 12 }}>SPECIES CONCENTRATION PROFILES</p>
                   <ResponsiveContainer width="100%" height={260}>
@@ -415,7 +478,6 @@ export default function App() {
                   </ResponsiveContainer>
                 </div>
 
-                {/* Temperature chart */}
                 <div style={{ background: "#112218", border: "1px solid #1e3a28", borderRadius: 8, padding: 16 }}>
                   <p style={{ fontSize: 12, color: "#8aaa90", marginBottom: 12 }}>TEMPERATURE PROFILE</p>
                   <ResponsiveContainer width="100%" height={180}>
@@ -430,7 +492,6 @@ export default function App() {
                   </ResponsiveContainer>
                 </div>
 
-                {/* Economic analysis */}
                 <CostPanel costs={results.costs} />
               </>
             )}
