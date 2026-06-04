@@ -5,7 +5,7 @@ import {
   Tooltip, Legend, ResponsiveContainer
 } from "recharts";
 
-const API = "http://127.0.0.1:8000";
+const API = "https://kinetic-lab-backend.onrender.com";
 
 const COLORS = [
   "#6dbf67", "#60a5fa", "#f97316", "#e879f9",
